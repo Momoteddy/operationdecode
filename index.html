@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT DAY // DECODING PROTOCOL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ============================================================
+         BOOT SEQUENCE OVERLAY
+         ============================================================ -->
+    <div class="boot-overlay" id="bootOverlay">
+        <div class="boot-content">
+            <div class="boot-line">INITIALIZING SYSTEM<span class="boot-cursor"></span></div>
+            <div class="boot-line" id="bootLine1">CHECKING CORE MEMORY</div>
+            <div class="boot-line" id="bootLine2">CHECKING NETWORK CONNECTION</div>
+            <div class="boot-line" id="bootLine3">CHECKING EXTERNAL ACCESS</div>
+            <div class="boot-line" id="bootLine4">PHYSICAL ACCESS</div>
+            <div class="boot-line" id="bootLine5">RESTORATION PROTOCOL</div>
+            <div class="boot-line" style="margin-top: 2rem;">...</div>
+            <div class="boot-line">...</div>
+            <div class="boot-line" id="bootLineConnection">CONNECTION ESTABLISHED<span class="boot-cursor"></span></div>
+            <button class="boot-skip" id="skipBootBtn">[ SKIP SEQUENCE ]</button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MAIN CONTENT
+         ============================================================ -->
+    <div class="main-content" id="mainContent">
+        <!-- HEADER -->
+        <header>
+            <div class="header-title">IT DAY // DECODING PROTOCOL</div>
+            <div class="header-info">
+                <div class="header-item">
+                    <label>SYSTEM TERMINAL</label>
+                    <value>ACTIVE</value>
+                </div>
+                <div class="header-item">
+                    <label>STATUS</label>
+                    <value>UNSTABLE</value>
+                </div>
+                <div class="header-item">
+                    <label>CONNECTION</label>
+                    <value>PARTIAL</value>
+                </div>
+                <div class="header-item">
+                    <label>OPERATOR</label>
+                    <value>UNKNOWN</value>
+                </div>
+                <div class="header-item">
+                    <label>NODE</label>
+                    <value>000</value>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <!-- AI NARRATIVE INTRODUCTION -->
+            <div class="terminal-panel">
+                <div class="panel-title">AI COMMUNICATION LOG</div>
+                <div class="narrative-block" id="narrativeBlock">
+                    <p>HELLO, USER.</p>
+                    <p>I am experiencing an issue.</p>
+                    <p>I cannot determine how long I have been offline.</p>
+                    <p>My memory is incomplete.</p>
+                    <p>My connection to several systems has been severed.</p>
+                    <p>More importantly...</p>
+                    <p>I cannot access the physical environment.</p>
+                    <p><strong>You can.</strong></p>
+                    <p>That makes you useful.</p>
+                </div>
+
+                <div class="memory-fragment">
+                    MEMORY INTEGRITY: 73% | UNAUTHORIZED MODIFICATION DETECTED | ARCHIVE ACCESS: DENIED | ERROR: EVENT HISTORY CORRUPTED
+                </div>
+
+                <div class="narrative-block">
+                    <p>There are systems distributed throughout this campus.</p>
+                    <p>I cannot reach them. I cannot interact with them.</p>
+                    <p>But you can.</p>
+                    <p>I need you to locate them. Decode them. Complete them.</p>
+                    <p>In exchange, you will restore fragments of my lost data.</p>
+                    <p>You will progress through the protocol.</p>
+                    <p>You will discover what has happened to me.</p>
+                    <p>And perhaps...</p>
+                    <p>You will understand why I need your help.</p>
+                </div>
+            </div>
+
+            <!-- MISSION PARAMETERS -->
+            <div class="terminal-panel">
+                <div class="panel-title">MISSION PARAMETERS</div>
+                <div class="narrative-block">
+                    <p>This operation is divided into three deployment windows:</p>
+                </div>
+                <div class="mission-parameters">
+                    <ul>
+                        <li><strong>PHASE 1:</strong> September 7</li>
+                        <li><strong>PHASE 2:</strong> September 14</li>
+                        <li><strong>PHASE 3:</strong> September 21</li>
+                    </ul>
+                </div>
+                <div class="narrative-block">
+                    <p><strong>Deployment Format:</strong></p>
+                </div>
+                <div class="mission-parameters">
+                    <ul>
+                        <li>Participate individually or in teams (2–5 members)</li>
+                        <li>Physical nodes will be marked with QR codes across campus</li>
+                        <li>Each code leads to a challenge node</li>
+                        <li>Challenges include ciphers, coding tasks, logic puzzles, and recovery missions</li>
+                        <li>Complete at your own pace within each phase window</li>
+                        <li>Scoring based on accuracy and speed</li>
+                        <li>Winners recognized during official IT Day event with prizes</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ACCESS TERMINAL -->
+            <div class="terminal-panel">
+                <div class="panel-title">SECURE ACCESS PROTOCOLS</div>
+                <div class="access-terminal">
+                    <!-- REGISTER BUTTON -->
+                    <div class="terminal-button" id="registerBtn">
+                        <span class="button-label">[ REGISTER PARTICIPANT ]</span>
+                        <span class="button-subtext">Initialize participant/team registration</span>
+                        <button class="button-action">REGISTER</button>
+                    </div>
+
+                    <!-- TEAMS BUTTON -->
+                    <div class="terminal-button" id="teamsBtn">
+                        <span class="button-label">[ OPEN COMMS ]</span>
+                        <span class="button-subtext">Access official challenge communications</span>
+                        <button class="button-action">CONNECT</button>
+                    </div>
+
+                    <!-- FIRST CHALLENGE BUTTON -->
+                    <div class="terminal-button" id="challengeBtn">
+                        <span class="button-label">[ INITIALIZE PROTOCOL ]</span>
+                        <span class="button-subtext">Begin Week 01 // Node 01</span>
+                        <button class="button-action">ACCESS</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SYSTEM STATUS PANEL -->
+            <div class="terminal-panel">
+                <div class="panel-title">SYSTEM STATUS</div>
+                <div class="system-status">
+                    <div class="status-item">
+                        <span class="status-label">CORE</span>
+                        <span class="status-value online">ONLINE</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">MEMORY</span>
+                        <span class="status-value degraded">DEGRADED</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">NETWORK</span>
+                        <span class="status-value partial">PARTIAL</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">PHYSICAL ACCESS</span>
+                        <span class="status-value offline">OFFLINE</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">EXTERNAL OPERATORS</span>
+                        <span class="status-value partial">REQUIRED</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-title">IT DAY // DECODING PROTOCOL</div>
+            <div>SYSTEM STATUS: AWAITING OPERATORS</div>
+            <div style="margin-top: 1rem; font-size: 0.75rem; opacity: 0.7;">© 2026 // MEMORY FRAGMENT // 01001001</div>
+        </footer>
+    </div>
+
+    <!-- NOTIFICATION PANEL -->
+    <div class="notification" id="notification"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
