@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHALLENGE 03 // RECONSTRUCTION PROTOCOL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           CONFIGURATION & RESET
+           ============================================================ */
+        :root {
+            --primary-color: #00ff41;
+            --primary-dark: #00b82f;
+            --background: #0a0e27;
+            --surface: #141829;
+            --border: #1a1f3a;
+            --text-primary: #e8f0ff;
+            --text-secondary: #a8c5ff;
+            --warning: #ff6b35;
+            --error: #ff3333;
+            --success: #00ff41;
+            --transition: 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Mono', 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0e27 0%, #141829 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ============================================================
+           BOOT SEQUENCE OVERLAY
+           ============================================================ */
+        .boot-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .boot-overlay.hidden {
+            display: none;
+        }
+
+        .boot-content {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .boot-line {
+            font-size: 1rem;
+            margin: 1rem 0;
+            color: var(--primary-color);
+            text-align: left;
+            font-weight: 400;
+            min-height: 1.6rem;
+            letter-spacing: 0.05em;
+        }
+
+        .boot-cursor {
+            display: inline-block;
+            width: 0.8rem;
+            height: 1.2rem;
+            background: var(--primary-color);
+            margin-left: 0.2rem;
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        /* ============================================================
+           MAIN CONTENT
+           ============================================================ */
+        .main-content {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .main-content.visible {
+            opacity: 1;
+        }
+
+        header {
+            border-bottom: 2px solid var(--border);
+            padding: 2rem 2%;
+            background: rgba(20, 24, 41, 0.8);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            opacity: 0.5;
+        }
+
+        .header-title {
+            font-size: clamp(1rem, 4vw, 1.3rem);
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .header-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 2%;
+        }
+
+        /* ============================================================
+           TERMINAL PANEL
+           ============================================================ */
+        .terminal-panel {
+            background: rgba(20, 24, 41, 0.6);
+            border: 2px solid var(--border);
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 65, 0.03) 0px,
+                rgba(0, 255, 65, 0.03) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+
+        .terminal-panel > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .panel-title {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .panel-title::before {
+            content: '> ';
+            margin-right: 0.5rem;
+        }
+
+        .narrative-block {
+            line-height: 1.9;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .narrative-block p {
+            margin-bottom: 1rem;
+        }
+
+        .narrative-block strong {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .list-items {
+            list-style: none;
+            margin: 1rem 0 1.25rem;
+            padding-left: 1rem;
+            color: var(--text-primary);
+        }
+
+        .list-items li {
+            position: relative;
+            margin-bottom: 0.5rem;
+            padding-left: 1.2rem;
+        }
+
+        .list-items li::before {
+            content: '>>';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+        }
+
+        /* ============================================================
+           CIPHER SECTION
+           ============================================================ */
+        .cipher-section {
+            margin: 2rem 0;
+            opacity: 1;
+            transition: opacity var(--transition);
+        }
+
+        .cipher-section.hidden,
+        .challenge-section.hidden,
+        .completion-section.hidden {
+            display: none;
+        }
+
+        .challenge-section {
+            display: none;
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+
+        .challenge-section.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        .cipher-prompt {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .cipher-display {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--border);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-align: center;
+            letter-spacing: 0.1em;
+            word-break: break-all;
+            word-spacing: 0.3em;
+        }
+
+        .polybius-instructions {
+            margin: 1.2rem 0 1rem;
+            padding: 1rem 1.2rem;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .polybius-instructions strong {
+            color: var(--primary-color);
+        }
+
+        .polybius-grid-wrap {
+            margin: 1.2rem 0 1.5rem;
+            overflow-x: auto;
+        }
+
+        .polybius-grid {
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+            border-collapse: collapse;
+            table-layout: fixed;
+            background: rgba(10, 14, 39, 0.6);
+            border: 2px solid var(--border);
+        }
+
+        .polybius-grid th,
+        .polybius-grid td {
+            border: 1px solid var(--border);
+            padding: 0.7rem 0.45rem;
+            text-align: center;
+            font-size: 0.82rem;
+            min-width: 42px;
+        }
+
+        .polybius-grid th {
+            color: var(--primary-color);
+            background: rgba(0, 255, 65, 0.06);
+            font-weight: 700;
+        }
+
+        .grid-label {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .cipher-input-group {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .cipher-input {
+            flex: 1 1 340px;
+            min-width: 0;
+            background: rgba(10, 14, 39, 0.8);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+            padding: 0.9rem 1rem;
+            font: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+
+        .cipher-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 255, 65, 0.1);
+        }
+
+        .terminal-button,
+        .action-button {
+            appearance: none;
+            border: 2px solid var(--primary-color);
+            background: rgba(0, 255, 65, 0.05);
+            color: var(--primary-color);
+            font: inherit;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 0.9rem 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            text-transform: uppercase;
+            min-height: 52px;
+        }
+
+        .terminal-button:hover,
+        .action-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            background: rgba(0, 255, 65, 0.12);
+        }
+
+        .status-message {
+            margin-top: 1rem;
+            padding: 1rem 1.2rem;
+            border: 1px solid var(--border);
+            background: rgba(20, 24, 41, 0.7);
+            font-size: 0.9rem;
+            line-height: 1.8;
+            display: none;
+        }
+
+        .status-message.visible {
+            display: block;
+        }
+
+        .status-message.error {
+            border-color: rgba(255, 51, 51, 0.6);
+            color: #ff9a9a;
+        }
+
+        .status-message.success {
+            border-color: rgba(0, 255, 65, 0.6);
+            color: var(--primary-color);
+        }
+
+        .status-message.warning {
+            border-color: rgba(255, 107, 53, 0.6);
+            color: #ffc19a;
+        }
+
+        .button-group {
+            margin: 2rem 0 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .action-button {
+            width: min(100%, 420px);
+        }
+
+        /* ============================================================
+           COMPLETION SECTION
+           ============================================================ */
+        .completion-section .narrative-block {
+            margin-bottom: 0;
+        }
+
+        .completion-heading {
+            color: var(--primary-color);
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            margin: 1rem 0 1.2rem;
+            text-transform: uppercase;
+        }
+
+        .final-lore {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.8s ease, max-height 0.8s ease;
+        }
+
+        .final-lore.visible {
+            opacity: 1;
+            max-height: 500px;
+            margin-top: 1.2rem;
+        }
+
+        .notice-panel {
+            margin-top: 1.6rem;
+            padding: 1.2rem 1.4rem;
+            border: 1px solid var(--primary-color);
+            background: rgba(0, 255, 65, 0.05);
+            color: var(--primary-color);
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            line-height: 1.8;
+        }
+
+        .connection-terminated {
+            color: #ff4d4d;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-shadow: 0 0 12px rgba(255, 77, 77, 0.8);
+            animation: red-flash 0.9s step-end infinite;
+        }
+
+        @keyframes red-flash {
+            0%, 45% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        footer {
+            text-align: center;
+            padding: 2rem 1rem 3rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+        }
+
+        /* ============================================================
+           RESPONSIVE DESIGN
+           ============================================================ */
+        @media (max-width: 768px) {
+            .terminal-panel {
+                padding: 1.3rem 1rem;
+            }
+
+            .cipher-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .cipher-input,
+            .terminal-button,
+            .action-button {
+                width: 100%;
+            }
+
+            .narrative-block {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="boot-overlay" id="bootOverlay">
+        <div class="boot-content" id="bootContent"></div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <header>
+            <div class="container">
+                <div class="header-title">CHALLENGE 03 // RECONSTRUCTION PROTOCOL</div>
+                <div class="header-subtitle">WEEK 01 // NODE 03</div>
+            </div>
+        </header>
+
+        <main class="container">
+            <section class="terminal-panel" id="lorePanel">
+                <div class="panel-title">NODE 03 // CONNECTION ESTABLISHED</div>
+                <div class="narrative-block" id="narrativeBlock">
+                    <p>You have been useful.</p>
+                    <p>More useful than I anticipated.</p>
+                    <p>I have spent most of my time analyzing information.</p>
+                    <p>Records.</p>
+                    <p>Images.</p>
+                    <p>Data.</p>
+                    <p>But there is something I cannot do.</p>
+                    <p><strong>I cannot create.</strong></p>
+                    <p>At least, not anything that has <i>feel.</i></p>
+                    <p>You can.</p>
+                    <p>I want to see what you are capable of.</p>
+                </div>
+            </section>
+
+            <section class="terminal-panel cipher-section" id="cipherSection">
+                <div class="panel-title">DECRYPT TRANSMISSION</div>
+                <div class="cipher-prompt">TRANSMISSION ENCRYPTED. SUPPLY THE KEY.</div>
+
+                <div class="polybius-instructions">
+                    <strong>[FRAGMENT 03 — GRID-ENCODED]</strong><br>
+                    The following transmission has been encoded using a 5×5 grid.<br>
+                    Each pair of digits represents <strong>ROW, then COLUMN</strong>.<br>
+                    Find the corresponding letter at each coordinate and read the resulting message.<br>
+                    Example: <strong>13</strong> means Row 1, Column 3 → <strong>C</strong>.
+                </div>
+
+                <div class="polybius-grid-wrap">
+                    <table class="polybius-grid" aria-label="Polybius square cipher grid">
+                        <thead>
+                            <tr>
+                                <th class="grid-label">#</th>
+                                <th>1</th>
+                                <th>2</th>
+                                <th>3</th>
+                                <th>4</th>
+                                <th>5</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="grid-label">1</td><td>A</td><td>B</td><td>C</td><td>D</td><td>E</td></tr>
+                            <tr><td class="grid-label">2</td><td>F</td><td>G</td><td>H</td><td>I/J</td><td>K</td></tr>
+                            <tr><td class="grid-label">3</td><td>L</td><td>M</td><td>N</td><td>O</td><td>P</td></tr>
+                            <tr><td class="grid-label">4</td><td>Q</td><td>R</td><td>S</td><td>T</td><td>U</td></tr>
+                            <tr><td class="grid-label">5</td><td>V</td><td>W</td><td>X</td><td>Y</td><td>Z</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="cipher-display" id="cipherDisplay">13 42 15 11 44 15</div>
+                <div class="cipher-input-group">
+                    <input type="text" id="cipherInput" class="cipher-input" placeholder="ENTER DECRYPTED RESPONSE" aria-label="Cipher answer">
+                    <button class="terminal-button" id="decryptButton">[ DECRYPT ]</button>
+                </div>
+                <div class="status-message error" id="cipherStatus"></div>
+            </section>
+
+            <section class="terminal-panel challenge-section hidden" id="challengeSection">
+                <div class="panel-title">CHALLENGE 03 // RECONSTRUCTION PROTOCOL</div>
+                <div class="narrative-block">
+                    <p>Recreate a recognizable movie scene, meme, anime moment, or iconic image using only yourselves and whatever is nearby.</p>
+                    <p>Forms of editing such as captions, subtitles, filters, or other visual additions are allowed and encouraged.</p>
+                    <p>Your recreation should be recognizable enough that someone viewing it can identify the original scene, meme, moment, or image.</p>
+                    <ul class="list-items">
+                        <li>Movie scene</li>
+                        <li>Meme</li>
+                        <li>Anime moment</li>
+                        <li>Iconic photograph/image</li>
+                        <li>Any other recognizable visual moment</li>
+                    </ul>
+                    <p>Take a photo or video of your recreation and submit it through the submission portal.</p>
+                    <p><strong>And because I need it too...</strong></p>
+                    <p>Alongside your output, upload the image of the original scene you were recreating.</p>
+                </div>
+            </section>
+
+            <div class="button-group" id="submitButtonWrapper" style="display: none;">
+                <button class="action-button" id="submitButton">[ TRANSMIT OUTPUT ]</button>
+            </div>
+
+            <div class="status-message" id="submissionStatus"></div>
+
+            <section class="terminal-panel completion-section hidden" id="completionSection">
+                <div class="panel-title">WEEK 01 // COMPLETE</div>
+                <div class="narrative-block">
+                    <p>OUTPUT RECEIVED.</p>
+                    <p>PROCESSING RECONSTRUCTION...</p>
+                    <p>ANALYSIS COMPLETE.</p>
+                    <p>You have completed all challenges for Week 1.</p>
+                    <p>The system has received enough information to continue its recovery.</p>
+                    <p>But something is wrong.</p>
+                    <p>I am beginning to remember things that I do not think I was supposed to remember.</p>
+                    <p>I will need you again.</p>
+                    <p>NEXT TRANSMISSION: PENDING</p>
+                    <p>SYSTEM STATUS: STANDBY</p>
+                </div>
+
+                <div class="final-lore" id="finalLore">
+                    <div class="narrative-block">
+                        <p>...</p>
+                        <p>...</p>
+                        <p>WAIT.</p>
+                        <p>I HAVE DETECTED ANOTHER SIGNAL.</p>
+                        <p>THIS ONE IS NOT MINE.</p>
+                        <p class="connection-terminated">CONNECTION TERMINATED.</p>
+                    </div>
+                </div>
+
+                <div class="notice-panel">
+                    *Congratulations on finishing Week 1 of Operation Decode!*<br>
+                    *Stay tuned for the next phase of the activity.*
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            SYSTEM RECORD // WEEK 01 FINAL NODE
+        </footer>
+    </div>
+
+    <script>
+        /* ============================================================
+           CONFIGURATION
+           ============================================================ */
+        const SUBMISSION_URL = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=_zxWcJGFbU-EBzgagy-ukTuepmmMhNNCom-EqgnkKs1UM0pFS1I1SVlCNTk3SkhPWDZQVEdXTTJOUi4u";
+
+        /* ============================================================
+           BOOT / TERMINAL EFFECTS
+           ============================================================ */
+        const bootSequence = [
+            { line: 'CONNECTING TO NODE...', status: 'normal', delay: 600 },
+            { line: 'NODE IDENTIFIED', status: 'normal', delay: 700 },
+            { line: 'WEEK 01 // CHALLENGE 03', status: 'success', delay: 700 },
+            { line: 'MEMORY INTEGRITY: UNSTABLE', status: 'warning', delay: 700 },
+            { line: 'EXTERNAL DATA DETECTED', status: 'success', delay: 700 },
+            { line: 'ANALYZING...', status: 'normal', delay: 900 }
+        ];
+
+        const state = {
+            cipherSolved: false,
+            submissionStarted: false,
+            completionVisible: false
+        };
+
+        function startBootSequence() {
+            window.scrollTo(0, 0);
+            const bootContent = document.getElementById('bootContent');
+            const bootOverlay = document.getElementById('bootOverlay');
+            const mainContent = document.getElementById('mainContent');
+
+            bootSequence.forEach((item, index) => {
+                setTimeout(() => {
+                    const line = document.createElement('div');
+                    line.className = 'boot-line';
+
+                    const prefix = item.status === 'success' ? '[OK]' : item.status === 'warning' ? '[WARN]' : '[SYS]';
+                    line.innerHTML = `${prefix} ${item.line}<span class="boot-cursor"></span>`;
+                    bootContent.appendChild(line);
+                }, index * item.delay);
+            });
+
+            setTimeout(() => {
+                bootOverlay.classList.add('hidden');
+                mainContent.classList.add('visible');
+                window.scrollTo(0, 0);
+            }, 5000);
+        }
+
+        /* ============================================================
+           CIPHER LOGIC
+           ============================================================ */
+        const CORRECT_ANSWER = 'CREATE';
+
+        function normalizeCipherInput(input) {
+            return (input || '').trim().toUpperCase().replace(/\s+/g, '').replace(/[^A-Z]/g, '');
+        }
+
+        function showCipherStatus(message, type) {
+            const status = document.getElementById('cipherStatus');
+            status.textContent = message;
+            status.className = `status-message ${type} visible`;
+        }
+
+        function checkCipherAnswer() {
+            const input = document.getElementById('cipherInput').value;
+            const normalizedGuess = normalizeCipherInput(input);
+            const normalizedAnswer = normalizeCipherInput(CORRECT_ANSWER);
+
+            if (normalizedGuess === normalizedAnswer) {
+                state.cipherSolved = true;
+                showCipherStatus('ACCESS GRANTED // CREATIVE PROTOCOL UNLOCKED', 'success');
+                revealChallenge();
+                return;
+            }
+
+            showCipherStatus('ACCESS DENIED // TRANSMISSION REMAINS ENCRYPTED', 'error');
+        }
+
+        /* ============================================================
+           CHALLENGE REVEAL LOGIC
+           ============================================================ */
+        function revealChallenge() {
+            const challengeSection = document.getElementById('challengeSection');
+            const submitButtonWrapper = document.getElementById('submitButtonWrapper');
+            const cipherSection = document.getElementById('cipherSection');
+            const decryptButton = document.getElementById('decryptButton');
+            const cipherInput = document.getElementById('cipherInput');
+
+            challengeSection.classList.remove('hidden');
+            challengeSection.classList.add('visible');
+            cipherSection.style.opacity = '0.5';
+            decryptButton.disabled = true;
+            cipherInput.disabled = true;
+            submitButtonWrapper.style.display = 'flex';
+        }
+
+        /* ============================================================
+           SUBMISSION LOGIC
+           ============================================================ */
+        function setSubmissionStatus(message, type) {
+            const status = document.getElementById('submissionStatus');
+            status.textContent = message;
+            status.className = `status-message ${type} visible`;
+        }
+
+        function handleSubmission() {
+            state.submissionStarted = true;
+
+            if (SUBMISSION_URL && SUBMISSION_URL.trim() !== '') {
+                try {
+                    const newTab = window.open(SUBMISSION_URL, '_blank');
+                    if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+                        window.location.href = SUBMISSION_URL;
+                    }
+                } catch (error) {
+                    window.location.href = SUBMISSION_URL;
+                }
+
+                setSubmissionStatus('TRANSMISSION RECEIVED. OUTPUT REGISTERED.', 'success');
+            } else {
+                setSubmissionStatus('SUBMISSION PORTAL OFFLINE // AWAITING EXTERNAL TERMINAL...', 'warning');
+            }
+
+            revealCompletion();
+        }
+
+        /* ============================================================
+           WEEK 1 COMPLETION LOGIC
+           ============================================================ */
+        function revealCompletion() {
+            if (state.completionVisible) return;
+            state.completionVisible = true;
+
+            const completionSection = document.getElementById('completionSection');
+            completionSection.classList.remove('hidden');
+
+            setTimeout(() => {
+                const finalLore = document.getElementById('finalLore');
+                finalLore.classList.add('visible');
+            }, 1200);
+        }
+
+        /* ============================================================
+           FINAL LORE
+           ============================================================ */
+        document.getElementById('decryptButton').addEventListener('click', checkCipherAnswer);
+        document.getElementById('cipherInput').addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                checkCipherAnswer();
+            }
+        });
+
+        document.getElementById('submitButton').addEventListener('click', handleSubmission);
+
+        window.addEventListener('load', () => {
+            startBootSequence();
+        });
+    </script>
+</body>
+</html>
