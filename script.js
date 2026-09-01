@@ -1,8 +1,8 @@
 // ============================================================
 // CONFIGURATION - UPDATE THESE WITH ACTUAL URLS
 // ============================================================
-const REGISTRATION_URL = ""; // PLACEHOLDER: Insert Microsoft Forms URL here
-const TEAMS_URL = ""; // PLACEHOLDER: Insert Microsoft Teams URL here
+const REGISTRATION_URL = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=_zxWcJGFbU-EBzgagy-ukQalSOBqF3ZPnhFQAFjPNv9UQ0ZHWVFCUVdPVU1LOVVVWVpKQjUzNEU3Ri4u"; // PLACEHOLDER: Insert Microsoft Forms URL here
+const TEAMS_URL = "https://teams.microsoft.com/l/team/19%3AWl1aCTW1al2Hd2KwggHFyX3h4jVeMpwdCAQEBod4qoQ1%40thread.tacv2/conversations?groupId=04c4e9a1-7a5f-48cd-8622-cefc154bf39e&tenantId=70563cff-8591-4f6d-8407-381a832fae91"; // PLACEHOLDER: Insert Microsoft Teams URL here
 const FIRST_CHALLENGE_URL = "CHALLENGES/WEEK 1/am28c09.html";
 
 // ============================================================

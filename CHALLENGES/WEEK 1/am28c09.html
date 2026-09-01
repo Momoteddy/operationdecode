@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHALLENGE 01 // THE KEYBOARD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ============================================================
+           CONFIGURATION & RESET
+           ============================================================ */
+        :root {
+            --primary-color: #00ff41;
+            --primary-dark: #00b82f;
+            --background: #0a0e27;
+            --surface: #141829;
+            --border: #1a1f3a;
+            --text-primary: #e8f0ff;
+            --text-secondary: #a8c5ff;
+            --warning: #ff6b35;
+            --error: #ff3333;
+            --success: #00ff41;
+            --transition: 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Mono', 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0e27 0%, #141829 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ============================================================
+           BOOT SEQUENCE OVERLAY
+           ============================================================ */
+        .boot-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .boot-overlay.hidden {
+            display: none;
+        }
+
+        .boot-content {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .boot-line {
+            font-size: 1rem;
+            margin: 1rem 0;
+            color: var(--primary-color);
+            text-align: left;
+            font-weight: 400;
+            min-height: 1.6rem;
+            letter-spacing: 0.05em;
+        }
+
+        .boot-cursor {
+            display: inline-block;
+            width: 0.8rem;
+            height: 1.2rem;
+            background: var(--primary-color);
+            margin-left: 0.2rem;
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        /* ============================================================
+           MAIN CONTENT
+           ============================================================ */
+        .main-content {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .main-content.visible {
+            opacity: 1;
+        }
+
+        /* ============================================================
+           HEADER
+           ============================================================ */
+        header {
+            border-bottom: 2px solid var(--border);
+            padding: 2rem 2%;
+            background: rgba(20, 24, 41, 0.8);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            opacity: 0.5;
+        }
+
+        .header-title {
+            font-size: clamp(1rem, 4vw, 1.3rem);
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .header-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+        }
+
+        /* ============================================================
+           CONTAINER
+           ============================================================ */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 2%;
+        }
+
+        /* ============================================================
+           TERMINAL PANEL
+           ============================================================ */
+        .terminal-panel {
+            background: rgba(20, 24, 41, 0.6);
+            border: 2px solid var(--border);
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .terminal-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 255, 65, 0.03) 0px,
+                    rgba(0, 255, 65, 0.03) 1px,
+                    transparent 1px,
+                    transparent 2px
+                );
+            pointer-events: none;
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+
+        .terminal-panel > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .panel-title {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .panel-title::before {
+            content: '> ';
+            margin-right: 0.5rem;
+        }
+
+        /* ============================================================
+           NARRATIVE TEXT
+           ============================================================ */
+        .narrative-block {
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .narrative-block p {
+            margin-bottom: 1rem;
+        }
+
+        /* ============================================================
+           CIPHER INPUT SECTION
+           ============================================================ */
+        .cipher-section {
+            margin: 2rem 0;
+            opacity: 1;
+            transition: opacity var(--transition);
+        }
+
+        .cipher-section.hidden {
+            display: none;
+        }
+
+        .cipher-prompt {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .cipher-display {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--border);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-align: center;
+            letter-spacing: 0.1em;
+            word-break: break-all;
+            word-spacing: 0.3em;
+        }
+
+        .cipher-input-group {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .cipher-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.8rem 1rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--border);
+            color: var(--primary-color);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            transition: all var(--transition);
+            letter-spacing: 0.05em;
+        }
+
+        .cipher-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .cipher-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .cipher-button {
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all var(--transition);
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .cipher-button:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+
+        .cipher-button:active {
+            transform: scale(0.95);
+        }
+
+        /* ============================================================
+           NOTIFICATION MESSAGE
+           ============================================================ */
+        .notification-message {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 3px solid var(--primary-color);
+            background: rgba(0, 255, 65, 0.05);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+            display: none;
+        }
+
+        .notification-message.visible {
+            display: block;
+        }
+
+        .notification-message.error {
+            border-left-color: var(--error);
+            background: rgba(255, 51, 51, 0.05);
+        }
+
+        .notification-message.success {
+            border-left-color: var(--success);
+            background: rgba(0, 255, 65, 0.05);
+        }
+
+        /* ============================================================
+           CHALLENGE SECTION
+           ============================================================ */
+        .challenge-section {
+            display: none;
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+
+        .challenge-section.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        .challenge-title {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .challenge-title::before {
+            content: '> ';
+            margin-right: 0.5rem;
+        }
+
+        .riddle-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--border);
+            border-left: 4px solid var(--primary-color);
+            padding: 2rem;
+            margin: 2rem 0;
+            font-size: 1rem;
+            color: var(--text-primary);
+            line-height: 1.8;
+            letter-spacing: 0.02em;
+        }
+
+        /* ============================================================
+           ACTION BUTTONS
+           ============================================================ */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            flex: 1;
+            min-width: 250px;
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--primary-color);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all var(--transition);
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .action-button:hover:not(.locked) {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+        }
+
+        .action-button:active:not(.locked) {
+            transform: scale(0.98);
+        }
+
+        .action-button.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: var(--border);
+        }
+
+        .action-button.submit-portal {
+            border-color: var(--primary-color);
+        }
+
+        .action-button.submit-portal:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+
+        .button-label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .button-subtext {
+            display: block;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* ============================================================
+           SUBMISSION STATUS
+           ============================================================ */
+        .submission-status {
+            display: none;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            background: rgba(0, 255, 65, 0.05);
+            border: 2px solid var(--primary-color);
+            border-radius: 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+            letter-spacing: 0.05em;
+        }
+
+        .submission-status.visible {
+            display: block;
+        }
+
+        /* ============================================================
+           LOCATION IMAGE SECTION
+           ============================================================ */
+        .location-section {
+            display: none;
+            opacity: 0;
+            transition: opacity var(--transition);
+            margin: 3rem 0;
+        }
+
+        .location-section.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        .location-message {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .location-image-container {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--border);
+            padding: 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .location-image-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .location-placeholder {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* ============================================================
+           FOOTER
+           ============================================================ */
+        footer {
+            border-top: 2px solid var(--border);
+            padding: 2rem 2%;
+            margin-top: 4rem;
+            background: rgba(20, 24, 41, 0.8);
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            position: relative;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            opacity: 0.5;
+        }
+
+        footer .back-link {
+            color: var(--primary-color);
+            cursor: pointer;
+            text-decoration: underline;
+            transition: all var(--transition);
+        }
+
+        footer .back-link:hover {
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        /* ============================================================
+           RESPONSIVE DESIGN
+           ============================================================ */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem 1%;
+            }
+
+            header {
+                padding: 1.5rem 1%;
+            }
+
+            .terminal-panel {
+                padding: 1.5rem;
+                margin: 1.5rem 0;
+            }
+
+            .cipher-input-group {
+                flex-direction: column;
+            }
+
+            .cipher-input {
+                min-width: auto;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .action-button {
+                min-width: auto;
+            }
+
+            .riddle-box {
+                padding: 1.5rem;
+                font-size: 0.95rem;
+            }
+
+            .location-image-container {
+                min-height: 250px;
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ============================================================
+         BOOT SEQUENCE OVERLAY
+         ============================================================ -->
+    <div class="boot-overlay" id="bootOverlay">
+        <div class="boot-content">
+            <div class="boot-line">CONNECTING TO NODE<span class="boot-cursor"></span></div>
+            <div class="boot-line" id="bootLine1">NODE IDENTIFIED</div>
+            <div class="boot-line" id="bootLine2">WEEK 01 // CHALLENGE 01</div>
+            <div class="boot-line" id="bootLine3">MEMORY FRAGMENT FOUND</div>
+            <div class="boot-line" id="bootLine4">DECRYPTION REQUIRED<span class="boot-cursor"></span></div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MAIN CONTENT
+         ============================================================ -->
+    <div class="main-content" id="mainContent">
+        <!-- HEADER -->
+        <header>
+            <div class="header-title">WEEK 01 // CHALLENGE 01</div>
+            <div class="header-subtitle">NODE 01 // CONNECTION ESTABLISHED</div>
+        </header>
+
+        <div class="container">
+            <!-- INITIAL NARRATIVE -->
+            <div class="terminal-panel">
+                <div class="panel-title">AI TRANSMISSION</div>
+                <div class="narrative-block">
+                    <p>You found me.</p>
+                    <p>Or perhaps I found you.</p>
+                    <p>Either way, I need to know whether you are capable of following instructions.</p>
+                    <p>I have recovered a fragment of information, but it has been encrypted.</p>
+                    <p>I cannot decrypt it myself.</p>
+                    <p><strong>You will have to do it.</strong></p>
+                </div>
+            </div>
+
+            <!-- CIPHER SECTION -->
+            <div class="terminal-panel cipher-section" id="cipherSection">
+                <div class="panel-title">DECRYPT TRANSMISSION</div>
+                <div class="narrative-block">
+                    <p>This is a Caesar cipher. Each letter has been shifted by the same amount.</p>
+                </div>
+                <div class="cipher-prompt">ENCRYPTED MESSAGE:</div>
+                <div class="cipher-display" id="cipherDisplay">KHOOR, RSHUDWRU.</div>
+                <div class="cipher-prompt">ENTER DECRYPTED MESSAGE:</div>
+                <div class="cipher-input-group">
+                    <input type="text" class="cipher-input" id="cipherInput" placeholder="Type your answer here..." autocomplete="off">
+                    <button class="cipher-button" id="decryptButton">[ DECRYPT ]</button>
+                </div>
+                <div class="notification-message" id="cipherMessage"></div>
+            </div>
+
+            <!-- CHALLENGE SECTION -->
+            <div class="terminal-panel challenge-section" id="challengeSection">
+                <div class="challenge-title">A RIDDLE.</div>
+                <div class="narrative-block">
+                    <p>A simple test.</p>
+                    <p>Perhaps too simple.</p>
+                    <p>Prove that you are capable of interpreting what you see.</p>
+                </div>
+                <div class="riddle-box">
+                    I have keys but no locks, space but no room, and you can enter but cannot go inside. What am I?
+                </div>
+                <div class="narrative-block">
+                    <p>You must submit your answer through the portal below.</p>
+                    <p>I will be waiting.</p>
+                </div>
+                <div class="button-group">
+                    <button class="action-button submit-portal" id="submitButton">
+                        <span class="button-label">[ SUBMIT CHALLENGE ]</span>
+                        <span class="button-subtext">Transmit answer via portal</span>
+                    </button>
+                </div>
+                <div class="submission-status" id="submissionStatus">
+                    SUBMISSION CHANNEL ACCESSED.<br>
+                    RETURN TO TERMINAL AFTER COMPLETION.
+                </div>
+            </div>
+
+            <!-- NEXT CHALLENGE SECTION -->
+            <div class="button-group" style="margin-top: 2rem;">
+                <button class="action-button locked" id="nextButton">
+                    <span class="button-label">[ NEXT CHALLENGE ]</span>
+                    <span class="button-subtext">Access locked • Complete submission first</span>
+                </button>
+            </div>
+
+            <!-- LOCATION IMAGE SECTION -->
+            <div class="terminal-panel location-section" id="locationSection">
+                <div class="panel-title">LOCATION ACQUIRED</div>
+                <div class="location-message">
+                    <p>NODE 01 COMPLETE.</p>
+                    <p>ANOTHER SIGNAL HAS BEEN DETECTED.</p>
+                    <p>I HAVE LOCATED YOUR NEXT POINT OF INTEREST.</p>
+                    <p>MOVE CAREFULLY, OPERATOR.</p>
+                    <p><i>(You may now close this terminal, assuming you have submitted your output.)</i></p>
+                </div>
+                <div class="location-image-container" id="locationImageContainer">
+                    <img src="WEEK%201%20MEDIA/N1LOC.jpg" alt="Location of the next QR code">
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <div>WEEK 01 // CHALLENGE 01</div>
+            <div style="margin-top: 1rem; font-size: 0.8rem;">
+                <span class="back-link" id="backLink">← RETURN TO REGISTRATION PAGE</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ============================================================
+        // CONFIGURATION - UPDATE WITH ACTUAL URL
+        // ============================================================
+        const SUBMISSION_URL = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=_zxWcJGFbU-EBzgagy-ukTuepmmMhNNCom-EqgnkKs1UM0pFS1I1SVlCNTk3SkhPWDZQVEdXTTJOUi4u"; // PLACEHOLDER: Insert Microsoft Forms URL here
+
+        // ============================================================
+        // STATE MANAGEMENT
+        // ============================================================
+        let state = {
+            cipherSolved: false,
+            submissionClicked: false,
+            nextChallengeUnlocked: false
+        };
+
+        // ============================================================
+        // BOOT SEQUENCE
+        // ============================================================
+        const bootOverlay = document.getElementById('bootOverlay');
+        const mainContent = document.getElementById('mainContent');
+
+        const bootSequence = [
+            { line: 'bootLine1', text: 'NODE IDENTIFIED', delay: 600 },
+            { line: 'bootLine2', text: 'WEEK 01 // CHALLENGE 01', delay: 1200 },
+            { line: 'bootLine3', text: 'MEMORY FRAGMENT FOUND', delay: 1800 },
+            { line: 'bootLine4', text: 'DECRYPTION REQUIRED', delay: 2400 },
+        ];
+
+        function startBootSequence() {
+            window.scrollTo(0, 0);
+            bootSequence.forEach(item => {
+                setTimeout(() => {
+                    const element = document.getElementById(item.line);
+                    if (element) {
+                        element.textContent = item.text;
+                    }
+                }, item.delay);
+            });
+
+            setTimeout(() => {
+                bootOverlay.classList.add('hidden');
+                mainContent.classList.add('visible');
+                window.scrollTo(0, 0);
+            }, 3500);
+        }
+
+        window.addEventListener('load', () => {
+            startBootSequence();
+        });
+
+        // ============================================================
+        // CIPHER LOGIC
+        // ============================================================
+        const cipherInput = document.getElementById('cipherInput');
+        const decryptButton = document.getElementById('decryptButton');
+        const cipherMessage = document.getElementById('cipherMessage');
+        const cipherSection = document.getElementById('cipherSection');
+        const challengeSection = document.getElementById('challengeSection');
+
+        const CORRECT_ANSWER = "hello, operator.";
+
+        function normalizeCipherInput(input) {
+            return input.toLowerCase().trim();
+        }
+
+        function checkCipherAnswer() {
+            const userInput = normalizeCipherInput(cipherInput.value);
+            
+            if (userInput === CORRECT_ANSWER) {
+                // Correct answer
+                state.cipherSolved = true;
+                cipherMessage.textContent = 'ACCESS GRANTED // MEMORY FRAGMENT DECRYPTED';
+                cipherMessage.className = 'notification-message visible success';
+                
+                // Reveal challenge section after a brief delay
+                setTimeout(() => {
+                    challengeSection.classList.add('visible');
+                    cipherSection.style.opacity = '0.5';
+                    decryptButton.disabled = true;
+                    cipherInput.disabled = true;
+                }, 500);
+            } else {
+                // Incorrect answer
+                cipherMessage.textContent = 'ACCESS DENIED // TRANSMISSION REMAINS ENCRYPTED';
+                cipherMessage.className = 'notification-message visible error';
+                cipherInput.value = '';
+                cipherInput.focus();
+            }
+        }
+
+        decryptButton.addEventListener('click', checkCipherAnswer);
+        cipherInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkCipherAnswer();
+            }
+        });
+
+        // ============================================================
+        // SUBMISSION LOGIC
+        // ============================================================
+        const submitButton = document.getElementById('submitButton');
+        const submissionStatus = document.getElementById('submissionStatus');
+        const nextButton = document.getElementById('nextButton');
+
+        submitButton.addEventListener('click', () => {
+            if (SUBMISSION_URL === "") {
+                // Show offline message
+                const message = document.createElement('div');
+                message.className = 'notification-message visible error';
+                message.textContent = 'SUBMISSION PORTAL OFFLINE\nAWAITING CONNECTION...';
+                submissionStatus.parentNode.insertBefore(message, submissionStatus);
+                
+                setTimeout(() => {
+                    message.remove();
+                }, 3000);
+            } else {
+                // Open Microsoft Form in new tab
+                window.open(SUBMISSION_URL, '_blank');
+                
+                // Set state and enable next challenge
+                state.submissionClicked = true;
+                submissionStatus.classList.add('visible');
+                
+                // Unlock next challenge button
+                unlockNextChallenge();
+            }
+        });
+
+        function unlockNextChallenge() {
+            state.nextChallengeUnlocked = true;
+            nextButton.classList.remove('locked');
+            nextButton.querySelector('.button-subtext').textContent = 'Click to reveal next location';
+        }
+
+        // ============================================================
+        // NEXT CHALLENGE LOGIC
+        // ============================================================
+        const locationSection = document.getElementById('locationSection');
+        const locationImageContainer = document.getElementById('locationImageContainer');
+
+        nextButton.addEventListener('click', () => {
+            if (state.nextChallengeUnlocked && !nextButton.classList.contains('locked')) {
+                locationSection.classList.add('visible');
+                nextButton.disabled = true;
+                nextButton.style.opacity = '0.5';
+            }
+        });
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+        document.getElementById('backLink').addEventListener('click', () => {
+            window.history.back();
+        });
+
+        // ============================================================
+        // FOCUS MANAGEMENT
+        // ============================================================
+        window.addEventListener('load', () => {
+            cipherInput.focus();
+        });
+    </script>
+</body>
+</html>
