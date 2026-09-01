@@ -72,7 +72,16 @@ document.getElementById('registerBtn').addEventListener('click', function() {
     if (REGISTRATION_URL === "") {
         showNotification('REGISTRATION PORTAL OFFLINE\nAWAITING CONNECTION...', 'warning', 3000);
     } else {
-        window.open(REGISTRATION_URL, '_blank');
+        try {
+            const win = window.open(REGISTRATION_URL, '_blank');
+            if (!win || win.closed || typeof win.closed === 'undefined') {
+                // Fallback if window.open is blocked
+                window.location.href = REGISTRATION_URL;
+            }
+        } catch (e) {
+            console.error('Failed to open registration portal:', e);
+            window.location.href = REGISTRATION_URL;
+        }
     }
 });
 
@@ -81,7 +90,16 @@ document.getElementById('teamsBtn').addEventListener('click', function() {
     if (TEAMS_URL === "") {
         showNotification('COMMUNICATION CHANNEL UNAVAILABLE\nAWAITING CONNECTION...', 'warning', 3000);
     } else {
-        window.open(TEAMS_URL, '_blank');
+        try {
+            const win = window.open(TEAMS_URL, '_blank');
+            if (!win || win.closed || typeof win.closed === 'undefined') {
+                // Fallback if window.open is blocked
+                window.location.href = TEAMS_URL;
+            }
+        } catch (e) {
+            console.error('Failed to open Teams:', e);
+            window.location.href = TEAMS_URL;
+        }
     }
 });
 
