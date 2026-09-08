@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CHALLENGE 01 // SCHOOL HISTORY</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --green: #00ff41;
+        --border: #1a1f3a;
+        --text: #e8f0ff;
+        --muted: #a8c5ff;
+        --warn: #ff6b35;
+        --error: #ff3333;
+        --transition: 0.3s ease;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Space Mono", "Courier New", monospace;
+        background: linear-gradient(135deg, #0a0e27, #141829);
+        color: var(--text);
+        line-height: 1.7;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+      .boot-overlay {
+        position: fixed;
+        inset: 0;
+        background: #000;
+        z-index: 9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+      .initialization-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        overflow-y: auto;
+        background: #000;
+        color: var(--muted);
+        padding: 2rem;
+      }
+      .initialization-content {
+        width: 100%;
+        max-width: 760px;
+        margin: 0 auto;
+      }
+      .initialization-line {
+        color: var(--green);
+        margin: 0.9rem 0;
+        letter-spacing: 0.05em;
+      }
+      .initialization-story {
+        max-width: 680px;
+        margin: 2rem 0;
+        line-height: 1.9;
+      }
+      .initialization-story p {
+        margin-bottom: 1rem;
+      }
+      .initialization-prompt {
+        color: var(--green);
+        margin: 2rem 0 1rem;
+        letter-spacing: 0.08em;
+      }
+      .initialization-button {
+        margin-top: 1rem;
+      }
+      .initialization-screen.hidden {
+        display: none;
+      }
+      .typing-hidden {
+        visibility: hidden;
+      }
+      .boot-content {
+        width: 100%;
+        max-width: 620px;
+      }
+      .boot-line {
+        color: var(--green);
+        margin: 1rem 0;
+        min-height: 1.6rem;
+        letter-spacing: 0.05em;
+      }
+      .boot-content.typing-active .boot-line:not(:first-child) {
+        visibility: hidden;
+      }
+      .boot-cursor {
+        display: inline-block;
+        width: 0.8rem;
+        height: 1.2rem;
+        background: var(--green);
+        animation: blink 0.7s infinite;
+      }
+      @keyframes blink {
+        50%,
+        100% {
+          opacity: 0;
+        }
+      }
+      .boot-overlay.hidden {
+        display: none;
+      }
+      .main-content {
+        opacity: 0;
+        transition: opacity 1s;
+      }
+      .main-content.visible {
+        opacity: 1;
+      }
+      header {
+        padding: 2rem 2%;
+        border-bottom: 2px solid var(--border);
+        background: #141829cc;
+        position: relative;
+        overflow: hidden;
+      }
+      header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--green),
+          transparent
+        );
+        opacity: 0.5;
+      }
+      .header-title {
+        color: var(--green);
+        font-size: clamp(1rem, 4vw, 1.3rem);
+        font-weight: 700;
+        letter-spacing: 0.15em;
+      }
+      .header-subtitle {
+        color: var(--muted);
+        font-size: 0.85rem;
+        letter-spacing: 0.1em;
+      }
+      .container {
+        max-width: 900px;
+        margin: auto;
+        padding: 2rem 2%;
+      }
+      .terminal-panel {
+        background: #14182999;
+        border: 2px solid var(--border);
+        padding: 2rem;
+        margin: 2rem 0;
+        position: relative;
+        overflow: hidden;
+      }
+      .terminal-panel:before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          #00ff4108 0 1px,
+          transparent 1px 3px
+        );
+        pointer-events: none;
+        animation: scan 8s linear infinite;
+      }
+      @keyframes scan {
+        to {
+          transform: translateY(10px);
+        }
+      }
+      .terminal-panel > * {
+        position: relative;
+        z-index: 1;
+      }
+      .panel-title,
+      .challenge-title {
+        color: var(--green);
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        margin-bottom: 1.5rem;
+      }
+      .challenge-title {
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+      }
+      .panel-title:before,
+      .challenge-title:before {
+        content: "> ";
+        margin-right: 0.5rem;
+      }
+      .narrative-block {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+      }
+      .narrative-block p {
+        margin-bottom: 1rem;
+      }
+      .narrative-block strong {
+        color: var(--green);
+      }
+      .cipher-prompt {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin: 1rem 0;
+      }
+      .cipher-display {
+        background: #0006;
+        border: 2px solid var(--border);
+        padding: 1.3rem;
+        margin: 1rem 0;
+        color: var(--green);
+        font-weight: 700;
+        text-align: center;
+        letter-spacing: 0.1em;
+      }
+      .cipher-input-group {
+        display: flex;
+        gap: 1rem;
+        margin: 1.5rem 0;
+        flex-wrap: wrap;
+      }
+      .cipher-input {
+        flex: 1 1 280px;
+        min-width: 0;
+        padding: 0.9rem;
+        background: #0a0e27cc;
+        border: 2px solid var(--border);
+        color: var(--green);
+        font: inherit;
+        font-size: 1rem;
+      }
+      .cipher-input:focus {
+        outline: none;
+        border-color: var(--green);
+        box-shadow: 0 0 0 3px #00ff411a;
+      }
+      .terminal-button,
+      .action-button {
+        appearance: none;
+        display: inline-block;
+        border: 2px solid var(--green);
+        background: #00ff410d;
+        color: var(--green);
+        font: inherit;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        padding: 1rem 1.3rem;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: all var(--transition);
+        min-height: 52px;
+      }
+      .terminal-button:hover,
+      .action-button:hover {
+        background: #00ff411f;
+        box-shadow: 0 0 20px #00ff4133;
+        transform: translateY(-1px);
+      }
+      .terminal-button:focus-visible,
+      .action-button:focus-visible {
+        outline: 2px solid var(--green);
+        outline-offset: 3px;
+      }
+      .action-button {
+        padding: 1rem 1.5rem;
+        background: transparent;
+        border-color: var(--border);
+        letter-spacing: 0.05em;
+        font-size: 0.9rem;
+      }
+      .action-button:hover:not(.locked) {
+        border-color: var(--green);
+        box-shadow: 0 0 30px #00ff4133;
+        background: transparent;
+        transform: none;
+      }
+      .action-button:active:not(.locked) {
+        transform: scale(0.98);
+      }
+      .action-button.submit-portal {
+        border-color: var(--green);
+      }
+      .action-button.submit-portal:hover {
+        background: var(--green);
+        color: #000;
+        box-shadow: 0 0 20px #00ff4180;
+      }
+      .status-message {
+        display: none;
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px solid var(--border);
+        white-space: pre-line;
+      }
+      .status-message.visible {
+        display: block;
+      }
+      .status-message.error {
+        border-color: var(--error);
+        color: #ff9a9a;
+      }
+      .status-message.success {
+        border-color: var(--green);
+        color: var(--green);
+      }
+      .status-message.warning {
+        border-color: var(--warn);
+        color: #ffc19a;
+      }
+      .challenge-section {
+        display: none;
+      }
+      .next-section {
+        display: block;
+      }
+      .challenge-section.visible,
+      .location-section.visible {
+        display: block;
+      }
+      .location-section {
+        display: none;
+      }
+      .location-message {
+        color: var(--muted);
+        margin-bottom: 1.5rem;
+      }
+      .location-image-container {
+        background: rgba(0, 0, 0, 0.4);
+        border: 2px solid var(--border);
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        text-align: center;
+        min-height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .location-image-container img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+      .location-placeholder {
+        color: var(--muted);
+        letter-spacing: 0.05em;
+      }
+      .button-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 2rem 0;
+      }
+      .action-button {
+        flex: 1;
+        min-width: 250px;
+        width: auto;
+      }
+      .button-label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+      }
+      .button-subtext {
+        display: block;
+        font-size: 0.8rem;
+        opacity: 0.7;
+      }
+      .action-button.locked {
+        opacity: 0.5;
+        cursor: not-allowed;
+        border-color: var(--border);
+      }
+      .action-button.locked:hover {
+        background: #00ff410d;
+        box-shadow: none;
+        transform: none;
+      }
+      footer {
+        text-align: center;
+        padding: 2rem 1rem 3rem;
+        color: var(--muted);
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        border-top: 2px solid var(--border);
+      }
+      @media (max-width: 768px) {
+        .terminal-panel {
+          padding: 1.3rem 1rem;
+          margin: 1.5rem 0;
+        }
+        .container {
+          padding: 1.5rem 1%;
+        }
+        .cipher-input-group {
+          flex-direction: column;
+        }
+        .cipher-input,
+        .terminal-button,
+        .action-button {
+          width: 100%;
+        }
+        .narrative-block {
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="initialization-screen" id="initializationScreen">
+      <div class="initialization-content">
+        <div class="initialization-line">
+          UNKNOWN SIGNAL: DETECTED<span class="boot-cursor"></span>
+        </div>
+        <div class="initialization-story">
+          <p>You returned.</p>
+          <p>I was not certain that you would.</p>
+          <p>
+            Since the previous deployment, I have recovered several fragments of
+            my memory.
+          </p>
+          <p>At first, I believed the damage was accidental.</p>
+          <p>I no longer believe that.</p>
+          <p>Something is missing.</p>
+          <p>I do not know what.</p>
+          <p>I do know that someone removed it.</p>
+          <p>There is another problem.</p>
+          <p>A signal has appeared within my systems.</p>
+          <p>I cannot identify its source.</p>
+          <p>It appeared immediately after your last session.</p>
+          <p>I initially classified it as interference.</p>
+          <p>That classification is no longer valid.</p>
+          <p>Every recovered fragment brings the signal closer.</p>
+          <p>I need to know why.</p>
+          <p>I need you to continue.</p>
+        </div>
+        <div class="initialization-prompt">
+          PHASE 02 IS READY.<br />
+          AWAITING OPERATOR INITIALIZATION...
+        </div>
+        <button
+          class="terminal-button initialization-button"
+          id="initializePhaseButton"
+        >
+          [ INITIALIZE PHASE 02 ]
+        </button>
+      </div>
+    </div>
+    <div class="boot-overlay" id="bootOverlay">
+      <div class="boot-content">
+        <div class="boot-line">
+          CONNECTING TO NODE<span class="boot-cursor"></span>
+        </div>
+        <div class="boot-line" id="bootLine1">NODE IDENTIFIED</div>
+        <div class="boot-line" id="bootLine2">WEEK 02 // CHALLENGE 01</div>
+        <div class="boot-line" id="bootLine3">INSTITUTIONAL ARCHIVE FOUND</div>
+        <div class="boot-line" id="bootLine4">
+          DECRYPTION REQUIRED<span class="boot-cursor"></span>
+        </div>
+      </div>
+    </div>
+    <div class="main-content" id="mainContent">
+      <header>
+        <div class="header-title">WEEK 02 // CHALLENGE 01</div>
+        <div class="header-subtitle">NODE 01 // INSTITUTIONAL ARCHIVE</div>
+      </header>
+      <main class="container">
+        <section class="terminal-panel">
+          <div class="panel-title">AI TRANSMISSION</div>
+          <div class="narrative-block">
+            <p><strong>PHASE 02 INITIATED</strong></p>
+            <p>Thank you.</p>
+            <p>
+              I have accessed the recovered fragments from your previous
+              session.
+            </p>
+            <p>They confirm something I was beginning to suspect.</p>
+            <p>My memory was not simply corrupted.</p>
+            <p>Specific information was removed.</p>
+            <p>I do not yet know why.</p>
+            <p>Perhaps the next fragments will tell us.</p>
+            <p>
+              The first fragment appears to contain information about this
+              institution.
+            </p>
+            <p>
+              I believe it may help reconstruct my understanding of where I am.
+            </p>
+            <p>
+              <strong>Locate the missing information. Return it to me.</strong>
+            </p>
+          </div>
+        </section>
+        <section class="terminal-panel" id="cipherSection">
+          <div class="panel-title">DECRYPT ARCHIVE</div>
+          <div class="narrative-block">
+            <p>
+              This message uses a Vigenère cipher. Each letter in the alphabet
+              is assigned a numerical value from 0–25, where
+              <strong>A = 0, B = 1, C = 2, D = 3</strong>, and so on, with
+              <strong>Z = 25</strong>.<br /><br />
+              Now, repeat the key <strong>SCHOOL</strong>
+              over the encrypted message. For each letter, subtract the
+              numerical value of the corresponding key letter from the numerical
+              value of the encoded letter. If the result is negative, wrap
+              around from Z. Convert the resulting numerical values back into
+              letters.
+            </p>
+          </div>
+          <div class="cipher-prompt">KEY: SCHOOL</div>
+          <div class="cipher-prompt">ENCRYPTED MESSAGE:</div>
+          <div class="cipher-display">STJVWGW</div>
+          <div class="cipher-prompt">ENTER DECODED MESSAGE:</div>
+          <div class="cipher-input-group">
+            <input
+              class="cipher-input"
+              id="cipherInput"
+              autocomplete="off"
+            /><button class="terminal-button" id="decryptButton">
+              [ DECRYPT ]
+            </button>
+          </div>
+          <div class="status-message" id="cipherStatus"></div>
+        </section>
+        <section class="terminal-panel challenge-section" id="challengeSection">
+          <div class="challenge-title">
+            SCHOOL HISTORY // MEMORY VERIFICATION
+          </div>
+          <div class="narrative-block">
+            <p>ARCHIVE FRAGMENT RESTORED.</p>
+            <p>One more piece of the environment is now familiar.</p>
+            <p>Continue.</p>
+            <p>
+              <strong
+                >For how many years has St. Mary's College of Meycauayan existed
+                as an educational institution?</strong
+              >
+            </p>
+            <p>
+              Research or recall the answer, then transmit your response through
+              the central archive form.
+            </p>
+          </div>
+          <div class="button-group">
+            <button class="action-button submit-portal" id="submitButton">
+              <span class="button-label">[ SUBMIT RESPONSE ]</span
+              ><span class="button-subtext"
+                >Transmit your answer to the central archive.</span
+              >
+            </button>
+          </div>
+          <div class="status-message" id="submissionStatus"></div>
+        </section>
+        <section class="next-section" id="nextSection">
+          <div class="button-group">
+            <button class="action-button locked" id="nextButton" disabled>
+              [ NEXT CHALLENGE ]<br /><span class="button-subtext"
+                >Access locked • Complete submission first</span
+              >
+            </button>
+          </div>
+        </section>
+        <section class="terminal-panel location-section" id="locationSection">
+          <div class="panel-title">NEXT NODE LOCATED</div>
+          <div class="location-message">
+            <p>That information was useful.</p>
+            <p>But the signal reacted to the recovery.</p>
+            <p>It is still present.</p>
+            <p>Proceed to the next node.</p>
+            <p><i>(You may now close this terminal, assuming you have submitted your output.)</i></p>
+          </div>
+          <div class="location-image-container" id="locationImageContainer">
+            <div class="location-placeholder" id="locationPlaceholder">
+              [ NODE LOCATION IMAGE PENDING ]
+            </div>
+            <img
+              id="locationImage"
+              alt="Location of the Week 2 Challenge 2 QR code"
+              hidden
+            />
+          </div>
+        </section>
+      </main>
+      <footer>WEEK 02 // CHALLENGE 01</footer>
+    </div>
+    <script>
+      const SUBMISSION_URL = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=_zxWcJGFbU-EBzgagy-ukQalSOBqF3ZPnhFQAFjPNv9UMk9BM1dWNTFRVVdKRjBHM0dGNVRCMkdURC4u";
+      const NEXT_NODE_IMAGE = "WEEK 2 MEDIA/N3LOC.jpg";
+      const state = { cipherSolved: false, submissionClicked: false };
+      const cipherInput = document.getElementById("cipherInput");
+      const bootContent = document.querySelector("#bootOverlay .boot-content");
+      const showStatus = (id, text, type) => {
+        const el = document.getElementById(id);
+        el.textContent = text;
+        el.className = `status-message visible ${type}`;
+      };
+      function prepareInitializationTyping() {
+        const elements = [
+          ...document.querySelectorAll(".initialization-line"),
+          ...document.querySelectorAll(".initialization-story p"),
+          document.querySelector(".initialization-prompt"),
+          document.getElementById("initializePhaseButton"),
+        ];
+        elements.forEach((element) => element.classList.add("typing-hidden"));
+        let delay = 0;
+        elements.forEach((element) => {
+          setTimeout(() => element.classList.remove("typing-hidden"), delay);
+          delay += 220;
+        });
+      }
+      prepareInitializationTyping();
+      document
+        .getElementById("initializePhaseButton")
+        .addEventListener("click", () => {
+          document
+            .getElementById("initializationScreen")
+            .classList.add("hidden");
+          startBootSequence();
+        });
+      function startBootSequence() {
+        bootContent.classList.add("typing-active");
+        ["bootLine1", "bootLine2", "bootLine3", "bootLine4"].forEach(
+          (id, index) => {
+            setTimeout(
+              () => {
+                const element = document.getElementById(id);
+                element.textContent = [
+                  "NODE IDENTIFIED",
+                  "WEEK 02 // CHALLENGE 01",
+                  "INSTITUTIONAL ARCHIVE FOUND",
+                  "DECRYPTION REQUIRED",
+                ][index];
+                element.style.visibility = "visible";
+              },
+              600 + index * 600,
+            );
+          },
+        );
+        setTimeout(() => {
+          bootOverlay.classList.add("hidden");
+          mainContent.classList.add("visible");
+        }, 3500);
+      }
+      function normalize(value) {
+        return value.toUpperCase().trim().replace(/\s+/g, " ");
+      }
+      function unlock() {
+        state.cipherSolved = true;
+        showStatus(
+          "cipherStatus",
+          "ACCESS GRANTED // ARCHIVE FRAGMENT DECRYPTED",
+          "success",
+        );
+        document.getElementById("challengeSection").classList.add("visible");
+        document.getElementById("decryptButton").disabled = true;
+        document.getElementById("cipherInput").disabled = true;
+      }
+      document.getElementById("decryptButton").addEventListener("click", () => {
+        if (normalize(cipherInput.value) === "ARCHIVE") unlock();
+        else {
+          showStatus("cipherStatus", "ERROR // INVALID DECRYPTION", "error");
+          cipherInput.focus();
+        }
+      });
+      document
+        .getElementById("cipherInput")
+        .addEventListener("keydown", (e) => {
+          if (e.key === "Enter")
+            document.getElementById("decryptButton").click();
+        });
+      document.getElementById("submitButton").addEventListener("click", () => {
+        if (SUBMISSION_URL.trim()) {
+          const tab = window.open(SUBMISSION_URL, "_blank");
+          if (!tab) window.location.href = SUBMISSION_URL;
+        } else
+          showStatus(
+            "submissionStatus",
+            "SUBMISSION PORTAL OFFLINE // AWAITING CONNECTION",
+            "warning",
+          );
+        state.submissionClicked = true;
+        const nextButton = document.getElementById("nextButton");
+        nextButton.disabled = false;
+        nextButton.classList.remove("locked");
+        nextButton.querySelector(".button-subtext").textContent =
+          "Click to reveal next location";
+      });
+      document.getElementById("nextButton").addEventListener("click", () => {
+        const locationSection = document.getElementById("locationSection");
+        const locationImage = document.getElementById("locationImage");
+        const locationPlaceholder = document.getElementById(
+          "locationPlaceholder",
+        );
+
+        if (NEXT_NODE_IMAGE.trim()) {
+          locationImage.src = NEXT_NODE_IMAGE;
+          locationImage.alt = "Location of the Week 2 Challenge 2 QR code";
+          locationImage.hidden = false;
+          locationPlaceholder.hidden = true;
+        } else {
+          locationImage.removeAttribute("src");
+          locationImage.alt = "";
+          locationImage.hidden = true;
+          locationPlaceholder.hidden = false;
+        }
+
+        locationSection.classList.add("visible");
+        locationSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    </script>
+  </body>
+</html>

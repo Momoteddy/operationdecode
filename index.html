@@ -98,9 +98,10 @@
                 </div>
                 <div class="mission-parameters">
                     <ul>
-                        <li><strong>PHASE 1:</strong> September 1</li>
+                        <li><strong>PHASE 1:</strong> September 2</li>
                         <li><strong>PHASE 2:</strong> September 8</li>
                         <li><strong>PHASE 3:</strong> September 15</li>
+                        <li><strong>CURRENT DEPLOYMENT:</strong> PHASE 2 // ACTIVE</li>
                     </ul>
                 </div>
                 <div class="narrative-block">
@@ -123,25 +124,45 @@
             <div class="terminal-panel">
                 <div class="panel-title">SECURE ACCESS PROTOCOLS</div>
                 <div class="access-terminal">
-                    <!-- REGISTER BUTTON -->
-                    <div class="terminal-button" id="registerBtn">
-                        <span class="button-label">[ REGISTER PARTICIPANT ]</span>
-                        <span class="button-subtext">Initialize participant/team registration</span>
-                        <button class="button-action">REGISTER</button>
+                    <div class="general-access">
+                        <!-- REGISTER BUTTON -->
+                        <div class="terminal-button" id="registerBtn">
+                            <span class="button-label">[ REGISTER PARTICIPANT ]</span>
+                            <span class="button-subtext">Initialize participant/team registration</span>
+                            <button class="button-action">REGISTER</button>
+                        </div>
+
+                        <!-- TEAMS BUTTON -->
+                        <div class="terminal-button" id="teamsBtn">
+                            <span class="button-label">[ OPEN COMMS ]</span>
+                            <span class="button-subtext">Access official challenge communications</span>
+                            <button class="button-action">CONNECT</button>
+                        </div>
                     </div>
 
-                    <!-- TEAMS BUTTON -->
-                    <div class="terminal-button" id="teamsBtn">
-                        <span class="button-label">[ OPEN COMMS ]</span>
-                        <span class="button-subtext">Access official challenge communications</span>
-                        <button class="button-action">CONNECT</button>
-                    </div>
+                    <div class="weekly-access">
+                        <div class="weekly-heading">
+                            <h3>WEEKLY DEPLOYMENT NODES</h3>
+                            <p>Select an available deployment window to access its initial challenge node.</p>
+                        </div>
 
-                    <!-- FIRST CHALLENGE BUTTON -->
-                    <div class="terminal-button" id="challengeBtn">
-                        <span class="button-label">[ INITIALIZE PROTOCOL ]</span>
-                        <span class="button-subtext">Begin Week 01 // Node 01</span>
-                        <button class="button-action">ACCESS</button>
+                        <a class="terminal-button weekly-button" href="CHALLENGES/WEEK 1/am28c09.html">
+                            <span class="button-label">[ WEEK 01 ] <span class="node-status available">AVAILABLE</span></span>
+                            <span class="button-subtext">Access Week 01 // Initial Challenge</span>
+                            <span class="button-action">ACCESS</span>
+                        </a>
+
+                        <a class="terminal-button weekly-button active" href="CHALLENGES/WEEK 2/14nctaq.html">
+                            <span class="button-label">[ WEEK 02 ] <span class="node-status active-status">STATUS: ACTIVE</span></span>
+                            <span class="button-subtext">Access Week 02 // Initial Challenge</span>
+                            <span class="button-action">ACCESS</span>
+                        </a>
+
+                        <div class="terminal-button weekly-button disabled" aria-disabled="true">
+                            <span class="button-label">[ WEEK 03 ] <span class="node-status locked">STATUS: LOCKED</span></span>
+                            <span class="button-subtext">Access Week 03 // Initial Challenge</span>
+                            <button class="button-action" type="button" disabled>LOCKED</button>
+                        </div>
                     </div>
                 </div>
             </div>

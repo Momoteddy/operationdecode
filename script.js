@@ -3,7 +3,6 @@
 // ============================================================
 const REGISTRATION_URL = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=_zxWcJGFbU-EBzgagy-ukQalSOBqF3ZPnhFQAFjPNv9UQ0ZHWVFCUVdPVU1LOVVVWVpKQjUzNEU3Ri4u"; // PLACEHOLDER: Insert Microsoft Forms URL here
 const TEAMS_URL = "https://teams.microsoft.com/l/team/19%3AWl1aCTW1al2Hd2KwggHFyX3h4jVeMpwdCAQEBod4qoQ1%40thread.tacv2/conversations?groupId=04c4e9a1-7a5f-48cd-8622-cefc154bf39e&tenantId=70563cff-8591-4f6d-8407-381a832fae91"; // PLACEHOLDER: Insert Microsoft Teams URL here
-const FIRST_CHALLENGE_URL = "CHALLENGES/WEEK 1/am28c09.html";
 
 // ============================================================
 // BOOT SEQUENCE
@@ -103,19 +102,6 @@ document.getElementById('teamsBtn').addEventListener('click', function() {
     }
 });
 
-// Challenge Button
-document.getElementById('challengeBtn').addEventListener('click', function() {
-    // Show transition message
-    const notification = document.getElementById('notification');
-    notification.innerHTML = 'INITIALIZING WEEK 01...<br>NODE 01 FOUND.<br>ACCESS GRANTED.';
-    notification.className = 'notification visible';
-    
-    // Navigate after brief delay
-    setTimeout(() => {
-        window.location.href = FIRST_CHALLENGE_URL;
-    }, 1000);
-});
-
 // ============================================================
 // SUBTLE EFFECTS
 // ============================================================
@@ -153,7 +139,7 @@ setInterval(addRandomGlitch, 8000 + Math.random() * 7000);
 // RESPONSIVE BUTTON SIZING
 // ============================================================
 function adjustButtonLayout() {
-    const accessTerminal = document.querySelector('.access-terminal');
+    const accessTerminal = document.querySelector('.general-access');
     if (window.innerWidth < 768) {
         accessTerminal.style.gridTemplateColumns = '1fr';
     } else {
